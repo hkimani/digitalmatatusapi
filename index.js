@@ -30,7 +30,7 @@ const corsOptions = {
     credentials: true,
 }
 
-var uri = `mongodb://${mongouser}:${mongopassword}@127.0.0.1:27017/dmapi`
+var uri = `mongodb://${mongouser}:${mongopassword}@127.0.0.1:27017/digitalmatatus`
 
 // Options
 var options = {
