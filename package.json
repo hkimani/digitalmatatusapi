@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/kimanihuon/digitalmatatusapi/issues"
   },
-  "homepage": "https://github.com/kimanihuon/digitalmatatusapi#readme"
+  "homepage": "https://github.com/kimanihuon/digitalmatatusapi#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "csurf": "^1.11.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.14",
+    "socket.io": "^2.3.0"
+  }
 }
