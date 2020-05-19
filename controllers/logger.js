@@ -8,6 +8,10 @@ Logger.prototype.debug = function (logText) {
     console.log(new Date() + 'debug:::::' + logText);
 };
 
+Logger.prototype.success = function (logText) {
+    console.log(new Date() + 'success:::::' + logText);
+};
+
 Logger.prototype.error = function (logText) {
     console.log(new Date() + 'error:::::' + logText);
 };
