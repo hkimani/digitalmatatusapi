@@ -25,12 +25,12 @@ const userSchema = new Schema({
         unique: true
     },
 
-    created_date: {
-        type: Date,
-        default: Date.now
-    }
+    contributions: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'contibutions',
+    },
 
-});
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
 // Auth
 // Method to set salt and hash the password for a user
