@@ -12,7 +12,7 @@ const logger = require("./controllers/logger.js");
 var routes = require('./routes/routes.js');
 var server;
 var socketio;
-var port = 9443;
+var port = 6443;
 var env = process.env.ENV;
 var mongouser = process.env.MONGO_INITDB_ROOT_USERNAME
 var mongopassword = process.env.MONGO_INITDB_ROOT_PASSWORD

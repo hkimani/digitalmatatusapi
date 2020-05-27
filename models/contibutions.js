@@ -7,14 +7,9 @@ const contributionSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     },
-    stop_id: {
-        type: String,
-    },
-    route_id: {
-        type: String
-    },
-    contribution: {
-        type: 'Number'
+    contribution_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'fares'
     }
 
 }, { timestamps: { updatedAt: 'updated_at', createdAt: 'created_at' } })

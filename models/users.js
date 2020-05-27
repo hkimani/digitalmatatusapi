@@ -7,7 +7,6 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     name: {
         type: String,
-        default: 'cool user'
     },
 
     hash: String,
@@ -23,6 +22,10 @@ const userSchema = new Schema({
         type: String,
         required: [true, 'Email field is required'],
         unique: true
+    },
+
+    verified: {
+        type: Boolean
     },
 
     contributions: {
