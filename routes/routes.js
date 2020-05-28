@@ -4,6 +4,7 @@ const router = express.Router();
 const jwtOperations = require("../controllers/auth");
 const User = require("../models/users");
 const Fare = require("../models/fares");
+const Contribution = require("../models/contibutions")
 const userValidator = require("../controllers/validateUser")
 
 router.get('/', function (req, res, next) {
@@ -37,25 +38,65 @@ router.post('/googleAuth', function (req, res, next) {
     })
 });
 
-router.post('/fare', jwtOperations.verifyToken, function (params) {
+router.post('/fare', jwtOperations.verifyToken, function (req, res, next) {
     logger.info(`Contribution request from I.P: ${req.connection.remoteAddress}`);
 
     let newFare = new Fare();
 
-    // TODO: ADD FARE STRUCTURE
+    newFare.origin_id = req.body.origin_id;
+    newFare.destination_id = req.body.destination_id;
+    newFare.route_id = req.body.route_id;
+    newFare.price = req.body.price;
+    newFare.period = req.body.period;
+    newFare.user = req.verifiedUser._id;
 
     newFare.save((err, fare) => {
 
         if (err) {
             logger.error(`Fare save failed from I.P: ${req.connection.remoteAddress} error: ${err}`)
             res.status(400).send({
+                success: false,
                 message: "Contribution failed try again later."
             });
         } else {
-            logger.success(`Contribution successful from I.P: ${req.connection.remoteAddress} Fare ID: ${FARE._id}`);
-            res.status(200).send({
-                message: "Contribution successful"
-            });
+
+            logger.success(`Fare saved successfully from I.P: ${req.connection.remoteAddress} Fare ID: ${fare._id}, Updating contributions model ....`);
+
+            // Update contributions
+            let newContribution = new Contribution();
+
+            newContribution.contribution_id = fare._id;
+            newContribution.user = req.verifiedUser._id;
+
+            newContribution.save((err, contribution) => {
+                if (err) {
+                    logger.error(`Contribution model update failed from I.P: ${req.connection.remoteAddress} error: ${err}`)
+                    res.status(400).send({
+                        success: false,
+                        message: "Fare saved but contribution failed to associate. No action required"
+                    });
+                } else {
+                    logger.success(`Contribution model updated successfully from I.P: ${req.connection.remoteAddress} Fare ID: ${fare._id}, Contribution ID: ${contribution._id} Updating user model ....`);
+
+                    User.updateOne({ "_id": req.verifiedUser._id }, { $push: { contributions: contribution._id } }, (err, result) => {
+                        if (err) {
+                            logger.error(`User association with contribution model failed from I.P: ${req.connection.remoteAddress} error: ${err}`)
+                            res.status(400).send({
+                                success: false,
+                                message: "Fare and Contribution saved but user failed to associate. No action required"
+                            });
+                        } else {
+                            logger.success(`User associated successfully from I.P: ${req.connection.remoteAddress} Fare ID: ${fare._id}, Contribution ID: ${contribution._id}, User ID: ${req.verifiedUser._id}`);
+
+                            res.status(200).send({
+                                success: true,
+                                message: "Contribution successful",
+                                info: { contribution_id: contribution._id, fare_id: fare._id }
+                            });
+                        }
+                    })
+                }
+            })
         }
     });
 });
@@ -114,7 +155,6 @@ router.post('/login/verify', jwtOperations.verifyToken, function (req, res, next
             res.send({ authorized: false, message: "Unable to get user. Probably not registered" })
         } else {
             logger.success(`Successfully verified user from database from I.P. ${req.connection.remoteAddress}`)
-
             res.send({ authorized: true, details: userValidator.trimUser(user) })
         }
     }).select('-password')
@@ -127,10 +167,10 @@ router.post('/update', jwtOperations.verifyToken, function (req, res, next) {
 
     User.updateOne({ _id: req.verifiedUser._id }, req.body.fields, function (err, doc) {
         if (err) {
-            logger.info(`Failed details update request from I.P: ${req.connection.remoteAddress} and user I.D ${req.verifiedUser._id} `)
+            logger.error(`Failed details update request from I.P: ${req.connection.remoteAddress} and user I.D ${req.verifiedUser._id} `)
             res.send({ success: false, message: err })
         } else {
-            logger.info(`Successfully updated details from I.P: ${req.connection.remoteAddress} and user I.D ${req.verifiedUser._id} `)
+            logger.success(`Successfully updated details from I.P: ${req.connection.remoteAddress} and user I.D ${req.verifiedUser._id} `)
             res.send({ success: true, message: 'User updated successfully' })
         }
     })

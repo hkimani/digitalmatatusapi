@@ -28,10 +28,20 @@ const userSchema = new Schema({
         type: Boolean
     },
 
-    contributions: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'contibutions',
+    about: {
+        type: String,
+        default: 'About me'
     },
+
+    tagline: {
+        type: String,
+        default: 'My tagline'
+    },
+
+    contributions: {
+        type: Array,
+        default: []
+    }
 
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 

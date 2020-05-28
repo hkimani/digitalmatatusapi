@@ -26,10 +26,6 @@ const fareSchema = new Schema({
         type: Number,
         required: true
     },
-    contributions: {
-        type: Array,
-        default: []
-    }
 }, { timestamps: { updatedAt: 'updated_at', createdAt: 'created_at' } });
 
 const Fares = mongoose.model('fares', fareSchema);
