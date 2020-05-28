@@ -68,7 +68,7 @@ app.use(function (err, req, res, next) { // Custom error middleware
     }
 });
 
-if (env == 'production') {
+if (env == 'Production') {
     // TLS Certificates for https
     var tls = {
         Production: {
@@ -86,7 +86,7 @@ if (env == 'production') {
     server = httpsServer.listen(port, () => logger.info("Success: secure server running on from port:::::::" + port));
 } else {
     httpsServer = http.createServer(app);
-    server = httpsServer.listen(port, () => logger.info("running server on from port:::::::" + port));
+    server = httpsServer.listen(port, () => logger.info("running server from port:::::::" + port));
 }
 
 // Websockets for real time data
