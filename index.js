@@ -21,6 +21,7 @@ var whitelist = ['https://weskool.team', 'https://weskool.team', 'http://localho
 
 console.log(mongouser)
 console.log(mongopassword)
+console.log(env)
 
 const corsOptions = {
     origin: function (origin, callback) {
