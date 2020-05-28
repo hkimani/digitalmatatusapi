@@ -146,6 +146,21 @@ router.post('/login', function (req, res, next) {
     }
 });
 
+// Logout
+router.post('/logout', jwtOperations.verifyToken, function (req, res, next) {
+
+    try {
+        res.clearCookie("jwtToken");
+        res.send({ success: true });
+        logger.info(`Logout success from I.P ${req.connection.remoteAddress} user I.D. : ${req.verifiedUser._id}`)
+
+    } catch (error) {
+        console.log(error)
+        res.send({ success: false, message: "Logout error try clearing cookies" })
+    }
+
+})
+
 // Session check
 router.post('/login/verify', jwtOperations.verifyToken, function (req, res, next) {
     // With callback function
