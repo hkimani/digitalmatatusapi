@@ -19,6 +19,9 @@ var mongopassword = process.env.MONGO_INITDB_ROOT_PASSWORD
 var app = express();
 var whitelist = ['https://weskool.team', 'https://weskool.team', 'http://localhost:8080']
 
+console.log(mongouser)
+console.log(mongopassword)
+
 const corsOptions = {
     origin: function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1) {
