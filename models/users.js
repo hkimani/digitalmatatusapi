@@ -38,6 +38,10 @@ const userSchema = new Schema({
         default: 'My tagline'
     },
 
+    avatar: {
+        type: String,
+    },
+
     contributions: {
         type: Array,
         default: []

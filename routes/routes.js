@@ -15,27 +15,34 @@ router.get('/', function (req, res, next) {
     })
 });
 
-router.post('/googleAuth', function (req, res, next) {
+router.post('/googleAuth', async function (req, res, next) {
     logger.info(`Account save request from I.P ${req.connection.remoteAddress}`);
 
     let newUser = new User();
 
     newUser.email = req.body.email;
     newUser.name = req.body.name;
+    newUser.avatar = req.body.avatar;
 
-    // TODO: Fetch google related user details
+    // Check if user exists
+    var userExists = await userValidator.validateGoogleAuth('email', req, res, next)
 
-    newUser.save((err, user) => {
-        if (err) {
-            logger.error(`Registration failed from I.P: ${req.connection.remoteAddress} error: ${err}`)
-            res.status(400).send({
-                message: "Registration failed."
-            });
-        } else {
-            logger.success(`Registration successful from I.P: ${req.connection.remoteAddress} User ID: ${user._id}`);
-            jwtOperations.generateToken(userValidator.trimUser(user), req, res, next, user._id);
-        }
-    })
+    if (userExists) {
+        // Generate token for already existing user
+        jwtOperations.generateToken(userValidator.trimUser(userExists), req, res, next, userExists._id);
+    } else {
+        newUser.save((err, user) => {
+            if (err) {
+                logger.error(`Registration failed from I.P: ${req.connection.remoteAddress} error: ${err}`)
+                res.status(400).send({
+                    message: "Registration failed."
+                });
+            } else {
+                logger.success(`Registration successful from I.P: ${req.connection.remoteAddress} User ID: ${user._id}`);
+                jwtOperations.generateToken(userValidator.trimUser(user), req, res, next, user._id);
+            }
+        })
+    }
 });
 
 router.post('/fare', jwtOperations.verifyToken, function (req, res, next) {

@@ -2,8 +2,8 @@ const logger = require("./logger");
 const User = require("../models/users");
 const jwtOperations = require("./auth");
 
-function validator() { 
-    
+function validator() {
+    this.returnType = 'non';
 }
 
 // Validate existing user
@@ -43,6 +43,28 @@ validator.prototype.validate = function (type, req, res, next) {
     }).catch(next);
 }
 
+// valide Google auth
+validator.prototype.validateGoogleAuth = async function (type, req, res, next) {
+
+    var instance = this;
+
+    // Use variable for object key and value
+    var obj = {};
+    obj[type] = req.body[type];
+
+    // resolves to the Mongoose document if MongoDB found a document with the given id, or null if no document was found.
+    return await User.findOne(obj, function (err, user) {
+        if (user) {
+            logger.success(`Found user from I.P: ${req.connection.remoteAddress} User ID: ${user._id}`);
+            instance.returnType = true;
+        } else {
+            logger.error(`User not found, failed from I.P: ${req.connection.remoteAddress} Invalid User type error: ${err}`);
+            instance.returnType = false;
+        }
+    }).catch(next);
+
+
+}
 
 validator.prototype.trimUser = function (user) {
     var newUser = JSON.parse(JSON.stringify(user))
