@@ -4,8 +4,9 @@ const router = express.Router();
 const jwtOperations = require("../controllers/auth");
 const User = require("../models/users");
 const Fare = require("../models/fares");
-const Contribution = require("../models/contibutions")
-const userValidator = require("../controllers/validateUser")
+const Contribution = require("../models/contibutions");
+const userValidator = require("../controllers/validateUser");
+const stats = require("../controllers/stats");
 
 router.get('/', function (req, res, next) {
     logger.info(`Get request from I.P: ${req.connection.remoteAddress}`);
@@ -182,6 +183,28 @@ router.post('/login/verify', jwtOperations.verifyToken, function (req, res, next
     }).select('-password')
 });
 
+router.get('/verifiedUserstats', jwtOperations.verifyToken, function (req, res, next) {
+    logger.info(`Verified User Stats request from I.P. ${req.connection.remoteAddress}`)
+    User.findOne(req.verifiedUser._id, 'contributions', function (err, contributions) {
+        if (err) {
+            logger.error(`Failed getting user stats from I.P. ${req.connection.remoteAddress}, message: ${err} or not registered`);
+            res.send({ success: false, message: "Unable to fetch stats, something happended" })
+        } else {
+            if (contributions) {
+                logger.success(`Success getting user stats from I.P. ${req.connection.remoteAddress}, message: ${err} or not registered`);
+                res.send({ success: true, message: "Records found" })
+            } else {
+                logger.error(`Failed getting user stats from I.P. ${req.connection.remoteAddress} Records may not be available`);
+                res.send({ success: false, message: "Records not found, something happended" })
+            }
+        }
+    })
+});
+
+router.get('/generalstats', function (req, res, next) {
+    logger.info(`General Stats request from I.P. ${req.connection.remoteAddress}`);
+    stats.fetchGeneralStats(req, res, next);
+});
 
 // Update user details
 router.post('/update', jwtOperations.verifyToken, function (req, res, next) {
